@@ -40,7 +40,12 @@ public class Execute
                 d.DeleteElement(AccountName,file,key);
                 break;
             case(4):
-                System.out.println(d.ReadDatabase(file,key));
+                System.out.println("ACCOUNT - PASSWORD");
+                String[] pairs=d.ReadDatabase(file,key).split(", ");
+                for(String pair:pairs)
+                {
+                    System.out.println(pair);
+                }
                 break;
             default:
                 System.out.println("Something went wrong! Try again!");
