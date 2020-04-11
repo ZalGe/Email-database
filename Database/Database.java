@@ -1,13 +1,11 @@
 package Database;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class Database {
+public class Database
+{
     Scanner sc = new Scanner(System.in);
     private String password;
 
@@ -44,8 +42,9 @@ public class Database {
     {
         List<String> encrypt;
         List<String> decrypt = new ArrayList<>();
+        StringBuilder output=new StringBuilder();
         try {
-            try (BufferedReader reader = new BufferedReader(new FileReader("Database.txt")))
+            try (BufferedReader reader = new BufferedReader(new FileReader(file)))
             {
                 encrypt = reader.lines().collect(Collectors.toList());
                 for(String element: encrypt)
@@ -57,7 +56,13 @@ public class Database {
         {
             e.printStackTrace();
         }
-        return decrypt.toString();
+
+        for(String element: decrypt)
+        {
+            output.append(element);
+            output.append(", ");
+        }
+        return output.toString();
 
     }
 
@@ -87,11 +92,18 @@ public class Database {
         else{return "Something went wrong. Process was terminated. Try to restart the program.";}
     }
 
-    public String browseFile(String accountName) throws IOException
+    public String browseFile(String AccountName, String file, String key) throws IOException
     {
-        Map<String,String> database;
-
-       return null;
+        Map<String, String> database = new HashMap<String, String>();
+        String[] pairs=this.ReadDatabase(file,key).split(", ");
+        for(int i=0;i<pairs.length;i++)
+        {
+            String pair=pairs[i];
+            String[] keyValue = pair.split(" - ");
+            database.put(keyValue[0], keyValue[1]);
+        }
+         System.out.println(database);
+         return database.get(AccountName);
 
     }
 }
