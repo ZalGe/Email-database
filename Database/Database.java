@@ -1,7 +1,11 @@
 package Database;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Database {
     Scanner sc = new Scanner(System.in);
@@ -36,24 +40,24 @@ public class Database {
     /**
      * Read elements from the database
      */
-    public void ReadDatabase(String file, String key)
+    public String ReadDatabase(String file, String key)
     {
-        String encrypt;
-        String decrypt;
+        List<String> encrypt;
+        List<String> decrypt = new ArrayList<>();
         try {
-            FileReader reader = new FileReader(file);
-            Scanner scan = new Scanner(reader);
-            while(scan.hasNextLine())
+            try (BufferedReader reader = new BufferedReader(new FileReader("Database.txt")))
             {
-                encrypt = scan.nextLine();
-                decrypt = Encrypting.decryptIt((encrypt), key);
-                System.out.println(decrypt);
+                encrypt = reader.lines().collect(Collectors.toList());
+                for(String element: encrypt)
+                {
+                    decrypt.add(Encrypting.decryptIt(element,key));
+                }
             }
-            reader.close();
         } catch (IOException e)
         {
             e.printStackTrace();
         }
+        return decrypt.toString();
 
     }
 
@@ -81,5 +85,13 @@ public class Database {
             return new String(password);
         }
         else{return "Something went wrong. Process was terminated. Try to restart the program.";}
+    }
+
+    public String browseFile(String accountName) throws IOException
+    {
+        Map<String,String> database;
+
+       return null;
+
     }
 }
