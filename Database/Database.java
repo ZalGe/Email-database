@@ -1,8 +1,6 @@
 package Database;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 public class Database {
@@ -12,23 +10,21 @@ public class Database {
     /**
      * Enter new elements to the database
      */
-    public void FillDatabase()
+    public void FillDatabase(String file, String key)
     {
         /* Constructor to receive email */
-        System.out.println("Enter your E-mail:");
+        System.out.println("Enter your Account name/E-mail address:");
         String email = sc.nextLine();
-        //System.out.println(email);
 
         /* Call a method asking for password */
         int defaultPasswordLenght = 10;
         this.password = setPass(defaultPasswordLenght);
-        System.out.println(password);
 
-        /* Writing to the file */
+        /* Writing to the file accounts + passwords */
         try
         {
-            FileWriter writer = new FileWriter("Database.txt", true);
-            writer.write(Encrypting.encryptIt((email + " - " + password), "192748749364") + "\n");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+            writer.write(Encrypting.encryptIt(email + " - " + password, key) + "\n");
             writer.close();
         }
         catch (IOException e)
@@ -40,17 +36,17 @@ public class Database {
     /**
      * Read elements from the database
      */
-    public void ReadDatabase()
+    public void ReadDatabase(String file, String key)
     {
         String encrypt;
         String decrypt;
         try {
-            FileReader reader = new FileReader("Database.txt");
+            FileReader reader = new FileReader(file);
             Scanner scan = new Scanner(reader);
             while(scan.hasNextLine())
             {
                 encrypt = scan.nextLine();
-                decrypt = Encrypting.decryptIt((encrypt), "192748749364");
+                decrypt = Encrypting.decryptIt((encrypt), key);
                 System.out.println(decrypt);
             }
             reader.close();
