@@ -73,8 +73,7 @@ public class Database
     public void DeleteElement(String AccountName, String file, String key)
     {
         /* Transferring data from file to map to map */
-        String decrypt = ReadDatabase(file, key);
-        String [] pairs = decrypt.split(", ");
+        String[] pairs=this.ReadDatabase(file,key).split(", ");
         Map<String, String> myMap = new HashMap<>();
         for (String pair : pairs) {
             String[] keyVal = pair.split(" - ");
@@ -105,6 +104,7 @@ public class Database
             {
                 e.printStackTrace();
             }
+            System.out.println("Deleted");
         }
         else {
             System.out.println("Something went wrong, try again!");}
