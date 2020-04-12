@@ -1,5 +1,7 @@
 package Database;
 
+
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -71,37 +73,62 @@ public class Execute
                      }
         }
 
+
         System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
                 "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
-        int choice2 = sc.nextInt();
-        switch(choice2)
-        {
-            case(1):
-                d.FillDatabase(file,key);
-                break;
-            case(2):
-                Scanner sc1 = new Scanner(System.in);
-                System.out.println("Password to which account would you like to know?");
-                AccountName = sc1.nextLine();
-                System.out.println(d.browseFile(AccountName,file,key));
-                break;
-            case(3):
-                Scanner sc2 = new Scanner(System.in);
-                System.out.println("Which account would you like to delete?");
-                AccountName = sc2.nextLine();
-                d.DeleteElement(AccountName,file,key);
-                break;
-            case(4):
-                System.out.println("ACCOUNT - PASSWORD");
-                String[] pairs=d.ReadDatabase(file,key).split(", ");
-                for(String pair:pairs)
-                {
-                    System.out.println(pair);
-                }
-                break;
-            default:
-                System.out.println("Something went wrong! Try again!");
 
-        }
+       while(true)
+       {
+           int choice2 = sc.nextInt();
+           switch (choice2) {
+               case (1):
+                   d.FillDatabase(file, key);
+                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
+                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
+                   break;
+               case (2):
+                   Scanner sc1 = new Scanner(System.in);
+                   System.out.println("Password to which account would you like to know?");
+                   AccountName = sc1.nextLine();
+                   System.out.println(d.browseFile(AccountName, file, key));
+                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
+                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
+
+                   break;
+               case (3):
+                   Scanner sc2 = new Scanner(System.in);
+                   System.out.println("Which account would you like to delete?");
+                   AccountName = sc2.nextLine();
+                   d.DeleteElement(AccountName, file, key);
+                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
+                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
+
+                   break;
+               case (4):
+                   System.out.println("ACCOUNT - PASSWORD");
+                   String[] pairs = d.ReadDatabase(file, key).split(", ");
+                   for (String pair : pairs) {
+                       System.out.println(pair);
+                   }
+                   System.out.println("back(9)" + "   " + "end(0)");
+                   break;
+               case (9):
+                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
+                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
+                   continue;
+               case(0):
+                   System.exit(0);
+
+               default:
+                   System.out.println("Something went wrong! Try again!");
+                   System.out.println("back(9)" + "   " + "end(0)");
+                   choice2=sc.nextInt();
+
+
+
+
+
+           }
+       }
     }
 }

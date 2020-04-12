@@ -42,7 +42,7 @@ public class Database
         try
         {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-            writer.write(Encrypting.encryptIt(text, key) + "\n");
+            writer.write(Encrypting.encryptIt(text, key) + "\n"+"\n");
             writer.close();
 
         }
