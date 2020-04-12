@@ -64,7 +64,14 @@ public class Database
             try (BufferedReader reader = new BufferedReader(new FileReader(file)))
             {
                 /* Transferring data from file to List */
+                ;
+
+
+                String line1=reader.readLine();
+                String line2=reader.readLine();
                 encrypt = reader.lines().collect(Collectors.toList());
+                encrypt.remove(line1);
+                encrypt.remove(line2);
                 for(String element: encrypt)
                 {
                     /* Decrypting data */
