@@ -1,99 +1,77 @@
 package Database;
+import java.security.spec.KeySpec;
+import java.util.Base64;
+import javax.crypto.*;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
-import javax.swing.*;
-
-public class Encrypting
+class Encrypting
 {
-    /**
-     * Function encrypts a password
-     * @param Input input string a.k.a. password
-     * @param Key coding number
-     * @return encrypted string
-     */
-    public static String encryptIt(String Input, String Key)
+    static private Cipher cipher;
+
+
+
+
+    public static String encryptIt(String plainText, String password)
     {
-       //position of char in string (0,1,2, ...)
-        int numberPos=0;
-        // ascii index of a char in string
-        int asciIndex;
-        //output string
-        StringBuilder Output=new StringBuilder();
-
-        // encrypting engine:
-        for(int i=0;i<Input.length();++i)
-         {
-          //transforms char to ascii index
-           asciIndex=Input.charAt(i);
-
-           /*if position of char in string is less than size of Key (example: Key=1356 has size of 4 numbers),
-             we add an element value of Key (at index=numberPos) to the original asciIndex, then we increment value of number pos
-             F. example: First element in message has asciIndex 0, our Key is 1234. The new asciIndex would be 0+Key[0]=>0+1=1
-                         Second element in message has asciIndex 2, the new asciIndex would be 2+Key[1]=>2+2=4
-                         and so on...
-            */
-           if(numberPos<Key.length())
-            {
-                 asciIndex+=(Key.charAt(numberPos));
-                 Output.append((char)asciIndex);
-                 numberPos+=1;
-
-             }
-        /*
-            if the numberPos is greather than a size of coding key, we reset number pos by removing the size of Ke.y
-            Remember, we have to be bounded in a size of key
-         */
-        else
-            {
-                numberPos -= Key.length();
-                asciIndex+=(int)(Key.charAt(numberPos));
-                Output.append((char)asciIndex);
-                numberPos+=1;
-            }
-       }
-        return Output.toString();
-       }
+        try
+        {
+            //initialization cipher
+            Encrypting.cipher = Cipher.getInstance("AES");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), "somepredefinedsalt".getBytes(), 65536, 128);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
 
 
-    /**
-     * Function decrypts a password
-     * @param Input input string a.k.a. password
-     * @param Key coding number
-     * @return decrypted string
-     */
-
-
-     public static String decryptIt(String Input, String Key)
-     {
-
-
-         int numberPos=0;
-         int asciIndex;
-         StringBuilder Output=new StringBuilder();
-         for(int i=0;i<Input.length();++i)
-         {
-             asciIndex=Input.charAt(i);
-             if(numberPos<Key.length())
-             {
-
-
-                //the only difference is, that we wrote -= insted of += (reverse operation)
-                 asciIndex-=(Key.charAt(numberPos));
-
-                 Output.append((char)asciIndex);
-                 numberPos+=1;
-
-             }
-
-             else
-             {
-                 numberPos -= Key.length();
-                 asciIndex-=(int)(Key.charAt(numberPos));
-                 Output.append((char)asciIndex);
-                 numberPos+=1;
-             }
-         }
-         return Output.toString();
-     }
+            //converts text to bites
+            byte[] plainTextByte = plainText.getBytes();
+            //initialization of cipher engine
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            //encoding text and saving to an array
+            byte[] encryptedByte = cipher.doFinal(plainTextByte);
+            //initialization of converter to string
+            Base64.Encoder encoder = Base64.getEncoder();
+            //conversion to string
+            String encryptedText = encoder.encodeToString(encryptedByte);
+            //output
+            return encryptedText;
+        }
+        catch(Exception e)
+        {
+            e.fillInStackTrace();
+            System.out.println(" Error: Somethig was wrong!");
+            return null;
+        }
 
     }
 
+
+    public static String decryptIt(String encryptedText, String password)
+    {
+
+
+        try
+        {
+            Encrypting.cipher = Cipher.getInstance("AES");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), "somepredefinedsalt".getBytes(), 65536, 128);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+
+            Base64.Decoder decoder = Base64.getDecoder();
+            byte[] encryptedTextByte = decoder.decode(encryptedText);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] decryptedByte = cipher.doFinal(encryptedTextByte);
+            String decryptedText = new String(decryptedByte);
+            return decryptedText;
+        }
+        catch (Exception e)
+        {
+            e.fillInStackTrace();
+            System.out.println(" Error: Somethig was wrong!");
+            return null;
+        }
+    }
+}

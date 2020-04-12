@@ -1,28 +1,80 @@
 package Database;
 
+import java.io.*;
 import java.util.Scanner;
 
 public class Execute
 {
     Database d = new Database();
 
-    String file;
-    String key;
-    String AccountName;
-    int choice;
+     String file;
+     String key;
+     String AccountName;
 
-    public void ExecuteApp()
-    {
+    public void ExecuteApp() throws FileNotFoundException {
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter database name (form: DATABASE_NAME.txt): ");
-        file = sc.nextLine();
-        System.out.println("Enter cypher key: ");
-        key = sc.nextLine();
+
+        System.out.println("DATABAZORIUM");
+        System.out.println("Main menu");
+        System.out.println("Create new database(1), Load database(2)");
+        int choice1=sc.nextInt();
+
+        switch(choice1)
+        {
+            case(1):
+                System.out.println("Enter your database name: ");
+                file=sc.next();
+
+                while(true)
+               {
+
+                   System.out.println("Create new password: ");
+                   key = sc.next();
+                   System.out.println("Confirm your password: ");
+                   String keyConfirmed=sc.next();
+                   if(key.equals(keyConfirmed))
+                   {
+                       d.FillFirstLine(file, key,"Database"+file);
+                       break;
+                   }
+                   System.out.println("Confirmed password doesn't match with origin one! Try again !");
+               }
+                break;
+
+            case(2):
+                       System.out.println("Enter your database name");
+                       file = sc.next();
+                       File FILE = new File(file);
+                       while(!FILE.exists())
+                       {
+                           System.out.println("Couldn't load your file! Try again!");
+                           sc.reset();
+                           System.out.println("Enter your database name");
+                           file = sc.next();
+                           FILE=new File(file);
+                       }
+
+                       Scanner passwordScanner=new Scanner(FILE);
+                       String text=passwordScanner.nextLine();
+                     while(true)
+                     {
+                         System.out.println("Enter your password: ");
+                         key=sc.next();
+                         if(Encrypting.decryptIt(text,key)==null)
+                         {
+                             System.out.println("Wrong password !!! Try again !");
+                             sc.reset();
+                             continue;
+                         }
+                         break;
+                     }
+        }
+
         System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
                 "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
-        choice = sc.nextInt();
-        switch(choice)
+        int choice2 = sc.nextInt();
+        switch(choice2)
         {
             case(1):
                 d.FillDatabase(file,key);

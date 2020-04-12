@@ -26,8 +26,25 @@ public class Database
         try
         {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-            writer.write(Encrypting.encryptIt(email + " - " + password, key) + "\n");
+            writer.write(Encrypting.encryptIt(email + " - " + password,key) + "\n");
             writer.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void FillFirstLine(String file, String key, String text)
+    {
+
+        /* Writing to the file accounts + passwords */
+        try
+        {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+            writer.write(Encrypting.encryptIt(text, key) + "\n");
+            writer.close();
+
         }
         catch (IOException e)
         {
