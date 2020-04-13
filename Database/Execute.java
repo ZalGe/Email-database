@@ -2,7 +2,9 @@ package Database;
 
 
 
+import javax.crypto.NoSuchPaddingException;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 public class Execute
@@ -13,13 +15,14 @@ public class Execute
      String key;
      String AccountName;
 
-    public void ExecuteApp() throws FileNotFoundException {
+    public void ExecuteApp() throws IOException, NoSuchPaddingException, NoSuchAlgorithmException {
 
         Scanner sc = new Scanner(System.in);
 
         System.out.println("DATABAZORIUM");
-        System.out.println("Main menu");
-        System.out.println("Create new database(1), Load database(2)");
+        System.out.println("Login menu");
+        System.out.println("1 - Register new database");
+        System.out.println("2- Login to an  existing database");
         int choice1=sc.nextInt();
 
         switch(choice1)
@@ -27,6 +30,7 @@ public class Execute
             case(1):
                 System.out.println("Enter your database name: ");
                 file=sc.next();
+
 
                 while(true)
                {
@@ -37,7 +41,7 @@ public class Execute
                    String keyConfirmed=sc.next();
                    if(key.equals(keyConfirmed))
                    {
-                       d.FillFirstLine(file, key,"Database"+file);
+                       d.FillLine(file ,key,1);
                        break;
                    }
                    System.out.println("Confirmed password doesn't match with origin one! Try again !");
@@ -45,14 +49,14 @@ public class Execute
                 break;
 
             case(2):
-                       System.out.println("Enter your database name");
+                       System.out.println("Enter your database name: ");
                        file = sc.next();
                        File FILE = new File(file);
                        while(!FILE.exists())
                        {
                            System.out.println("Couldn't load your file! Try again!");
                            sc.reset();
-                           System.out.println("Enter your database name");
+                           System.out.println("Enter your database name: ");
                            file = sc.next();
                            FILE=new File(file);
                        }
@@ -63,7 +67,7 @@ public class Execute
                      {
                          System.out.println("Enter your password: ");
                          key=sc.next();
-                         if(Encrypting.decryptIt(text,key)==null)
+                         if(Encrypting.decryptIt(text,key,1)==null)
                          {
                              System.out.println("Wrong password !!! Try again !");
                              sc.reset();
@@ -123,10 +127,6 @@ public class Execute
                    System.out.println("Something went wrong! Try again!");
                    System.out.println("back(9)" + "   " + "end(0)");
                    choice2=sc.nextInt();
-
-
-
-
 
            }
        }
