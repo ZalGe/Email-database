@@ -5,58 +5,121 @@ import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
+import static Database.InterfaceTexts.*;
 
 public class Database
 {
-    Scanner sc = new Scanner(System.in);
-    private String password;
+    private Scanner sc = new Scanner(System.in);
+    private String file;
+    private String database_password;
+
+
+    public void loadDatabase() throws IOException
+    {
+        System.out.println(databaseNameAsk);
+        file = sc.next();
+        File f = new File(file);
+
+        while(!f.exists())
+        {
+            System.out.println(loadingFileError);
+            sc.reset();
+            System.out.println(databaseNameAsk);
+            file = sc.next();
+            f=new File(file);
+        }
+
+        BufferedReader passwordScanner=new BufferedReader(new FileReader(f));
+        String cryptedText=passwordScanner.readLine();
+        while(true)
+        {
+            System.out.println(databasePasswordAsk);
+            String password=sc.next();
+            if(Encrypting.decryptIt(cryptedText,password,1)==null)
+            {
+                System.out.println(wrongPasswordError);
+                sc.reset();
+                continue;
+            }
+            database_password=password;
+            break;
+        }
+        passwordScanner.close();
+    }
+
+
+
+    public void createDatabase() throws Exception //constructor for loading a database
+    {
+        System.out.println(databaseNameAsk);
+        this.file=sc.next();
+
+
+        while(true)
+        {
+
+            System.out.println(newPasswordAsk);
+            String password1 = sc.next();
+            System.out.println(confirmPasswordAsk);
+            String password2 =sc.next();
+            if(password1.equals(password2))
+            {
+                database_password=password1;
+                BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+                writer.write(Encrypting.encryptIt(file, database_password,1) +"\n");
+                writer.close();
+
+                break;
+            }
+            System.out.println(mismatchPassword);
+        }
+
+    }
+
+
 
     /**
      * Attach new element to database, asks for password, generates password
-     * @param file database name
-     * @param key usser password
-     */
-    public void FillDatabase(String file, String key) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException {
-        /* Constructor to receive email */
-        System.out.println("Enter your Account name/E-mail address:");
-        String email = sc.nextLine();
 
+
+     */
+    public void FillDatabase() throws IOException
+    {
+        /* current account password */
+        String account_password;
+        /* constructor to receive email */
+        System.out.println(accountNameAsk);
+        String email = sc.next();
         /* Call a method asking for password */
         int defaultPasswordLength = 10;
-        this.password = setPass(defaultPasswordLength);
+        account_password = setPass(defaultPasswordLength);
 
         /* Writing to the file accounts + passwords */
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
             BufferedReader reader = new BufferedReader(new FileReader(file));
 
+           /* if database is empty, it has 1 line -- database password  */
           int lastLineIndex=1;
+
+          /* code, which allows us to detect last  line number */
            while(reader.readLine()!=null)
            {
                ++lastLineIndex;
            }
 
-
-            writer.write(Encrypting.encryptIt(email + " - " + password,key,lastLineIndex) + "\n");
+           /* Writing to the file accounts + passwords */
+            writer.write(Encrypting.encryptIt(email + " - " + account_password,database_password,lastLineIndex) + "\n");
             writer.close();
-    }
-
-    public void FillLine(String text, String key, int lineIndex) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException {
-
-             /* Writing to the file accounts + passwords */
-            BufferedWriter writer = new BufferedWriter(new FileWriter(text, true));
-            writer.write(Encrypting.encryptIt(text, key,lineIndex) +"\n");
-            writer.close();
-
+            reader.close();
     }
 
     /**
      * Reads the whole database according to first cipher line:
-     * @param file database name
-     * @param key  user password
+
      * @return decrypted database
      */
-    public String ReadDatabase(String file, String key) throws IOException
+    public String ReadDatabase() throws IOException
     {
         //Collections for encrypted and decrypted database:
         List<String> encrypt;
@@ -77,7 +140,7 @@ public class Database
         {
             //decrypting data
 
-            decrypt.add(Encrypting.decryptIt(element,key,lineIndex));
+            decrypt.add(Encrypting.decryptIt(element,database_password,lineIndex));
             ++lineIndex;
         }
 
@@ -94,12 +157,12 @@ public class Database
     /**
      * Delete 1 element from the database
      */
-    public void DeleteElement(String AccountName, String file, String key) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException
+    public void DeleteElement(String AccountName) throws Exception, NoSuchAlgorithmException, NoSuchPaddingException
     {
         BufferedReader br=new BufferedReader(new FileReader(file));
         String codeLine=br.readLine()+"\n";
         /* Transferring data from file to map to map */
-        String[] pairs=this.ReadDatabase(file,key).split(", ");
+        String[] pairs=this.ReadDatabase().split(", ");
         Map<String, String> myMap = new HashMap<>();
         for (String pair : pairs)
         {
@@ -109,7 +172,27 @@ public class Database
         /* Function to sort map */
         Map<String, String> sortedMap = new TreeMap<>(myMap);
         /* Deleting old file */
-        sortedMap.remove(AccountName);
+       System.out.println(InterfaceTexts.safetyQuestion);
+       String answer=sc.next();
+       String finalMessage="";
+
+       switch(answer)
+       {
+           case ("n"):
+           finalMessage+=InterfaceTexts.noRemovedFinalMessage;
+           break;
+
+
+           case("y"):
+
+               finalMessage+=InterfaceTexts.RemovedFinalMessage;
+               sortedMap.remove(AccountName);
+               break;
+           default:
+
+
+
+       }
         File f = new File(file);
 
 
@@ -125,7 +208,7 @@ public class Database
                 {
                     /* Encrypting data */
 
-                    String a = Encrypting.encryptIt(entry.getKey() + " - " + entry.getValue(),key, lineIndex);
+                    String a = Encrypting.encryptIt(entry.getKey() + " - " + entry.getValue(),database_password, lineIndex);
                     assert a != null;
                     bf.write(a);
                     bf.newLine();
@@ -134,22 +217,22 @@ public class Database
                 bf.flush();
                 bf.close();
 
-            System.out.println("Deleted");
+            System.out.println(finalMessage);
         }
         else
             {
-              System.out.println("Something went wrong, try again!");
+              System.out.println(InterfaceTexts.generalErrorText);
             }
     }
 
     /**
      * Read 1 element from database
      */
-    public String browseFile(String AccountName, String file, String key) throws IOException
+    public String browseFile(String AccountName) throws IOException
     {
         /* Transferring data from file to map */
         Map<String, String> database = new HashMap<>();
-        String[] pairs=this.ReadDatabase(file,key).split(", ");
+        String[] pairs=this.ReadDatabase().split(", ");
         for (String pair : pairs)
         {
             String[] keyValue = pair.split(" - ");
@@ -165,13 +248,14 @@ public class Database
      */
     public String setPass(int lenght)
     {
-        System.out.println("Do you have a password?   y/n");
-        String input = sc.nextLine();
+        System.out.println(passwortExistsAsk);
+        String input = sc.next();
         if(input.equals("y"))
         {
-            System.out.println("Enter your password:");
-            password = sc.nextLine();
-            return password;
+            System.out.println(accountPasswordAsk);
+            String account_password = sc.next();
+
+            return account_password;
         }
         else if (input.equals("n"))
         {
@@ -184,6 +268,6 @@ public class Database
             }
             return new String(password);
         }
-        else {return "Something went wrong! Process was terminated! Try to restart the program.";}
+        else {return generalErrorText;}
     }
 }

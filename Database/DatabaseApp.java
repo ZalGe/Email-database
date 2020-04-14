@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 public class DatabaseApp {
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException {
+    public static void main(String[] args) throws Exception {
        Execute execute = new Execute();
      execute.ExecuteApp();
 

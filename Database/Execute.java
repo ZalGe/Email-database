@@ -2,133 +2,153 @@ package Database;
 
 
 
-import javax.crypto.NoSuchPaddingException;
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
+import static Database.InterfaceTexts.*;
 
 public class Execute
 {
     Database d = new Database();
 
-     String file;
-     String key;
-     String AccountName;
 
-    public void ExecuteApp() throws IOException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public void ExecuteApp() throws Exception
+
+    {
 
         Scanner sc = new Scanner(System.in);
+        System.out.println(programName);
 
-        System.out.println("DATABAZORIUM");
-        System.out.println("Login menu");
-        System.out.println("1 - Register new database");
-        System.out.println("2- Login to an  existing database");
-        int choice1=sc.nextInt();
+        /* first user's choice number */
+        String choice1;
+        /* second user's choice number */
+        String choice2;
+        /* third user's choice number */
+        String choice3;
+        /* command for exit while loop1 */
+        boolean stopLoop1=false;
+       /* command for exit while loop2 */
+        boolean stopLoop2=false;
+        /* command for exit while loop3 */
+        boolean stopLoop3;
 
-        switch(choice1)
+
+while(true)
+{
+    stopLoop3=false;
+    /* this is loop1  a.k.a. login menu */
+    while (!stopLoop1)
+    {
+
+        System.out.println(loginMenu);
+
+        /* loading user's  1st. choice */
+        choice1=sc.next();
+
+        switch (choice1)
         {
-            case(1):
-                System.out.println("Enter your database name: ");
-                file=sc.next();
+            case ("1"):
+                d.createDatabase();
+                stopLoop1 = true;
+                break;
+            case ("2"):
+                d.loadDatabase();
+                stopLoop1 = true;
+                break;
+            case ("0"):
+                System.exit(0);
+            default:
+                System.out.println(generalErrorText);
+                sc.reset();
+        }
+    }
 
+   /* this is loop2 a.k.a. main menu */
+    while (!stopLoop2)
+    {
 
-                while(true)
-               {
+        System.out.println(mainMenu);
+        choice2 = sc.next();
+        switch (choice2)
+        {
+            case ("1"):
+                d.FillDatabase();
+                break;
+            case ("2"):
+                Scanner sc1 = new Scanner(System.in);
+                System.out.println(accountToBrowseAsk);
+                String accountName = sc1.nextLine();
+                System.out.println(d.browseFile(accountName));
 
-                   System.out.println("Create new password: ");
-                   key = sc.next();
-                   System.out.println("Confirm your password: ");
-                   String keyConfirmed=sc.next();
-                   if(key.equals(keyConfirmed))
-                   {
-                       d.FillLine(file ,key,1);
-                       break;
-                   }
-                   System.out.println("Confirmed password doesn't match with origin one! Try again !");
-               }
+                break;
+            case ("3"):
+                Scanner sc2 = new Scanner(System.in);
+                System.out.println(accountToDeleteAsk);
+                String accountName2 = sc2.nextLine();
+                d.DeleteElement(accountName2);
+
+                break;
+            case ("4"):
+                System.out.println("ACCOUNT - PASSWORD");
+                String[] pairs = d.ReadDatabase().split(", ");
+                for (String pair : pairs) {
+                    System.out.println(pair);
+                }
+                System.out.println(bottomMenu);
+                stopLoop2 = true;
+                break;
+            case ("0"):
+                System.exit(0);
+            case ("8"):
+                stopLoop2 = true;
+                stopLoop1 = false;
+                stopLoop3 = true;
+
+                break;
+            default:
+                System.out.println(generalErrorText);
+                sc.reset();
                 break;
 
-            case(2):
-                       System.out.println("Enter your database name: ");
-                       file = sc.next();
-                       File FILE = new File(file);
-                       while(!FILE.exists())
-                       {
-                           System.out.println("Couldn't load your file! Try again!");
-                           sc.reset();
-                           System.out.println("Enter your database name: ");
-                           file = sc.next();
-                           FILE=new File(file);
-                       }
 
-                       Scanner passwordScanner=new Scanner(FILE);
-                       String text=passwordScanner.nextLine();
-                     while(true)
-                     {
-                         System.out.println("Enter your password: ");
-                         key=sc.next();
-                         if(Encrypting.decryptIt(text,key,1)==null)
-                         {
-                             System.out.println("Wrong password !!! Try again !");
-                             sc.reset();
-                             continue;
-                         }
-                         break;
-                     }
+        }
+    }
+
+        /* this is bottom menu */
+
+        while(!stopLoop3)
+        {
+            choice3=sc.next();
+            switch (choice3)
+            {
+                case ("9"):
+                    /* returns user to main menu*/
+
+                    stopLoop3=true;
+                    stopLoop2=false;
+                    stopLoop1=true;
+                    break;
+                case ("0"):
+                    System.exit(0);
+                case ("8"):
+                      /* returns user to login menu*/
+                    stopLoop3=true;
+                    stopLoop1=false;
+                    stopLoop2=false;
+                    break;
+                default:
+                    System.out.println(generalErrorText);
+                    sc.reset();
+
+            }
         }
 
-
-        System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
-                "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
-
-       while(true)
-       {
-           int choice2 = sc.nextInt();
-           switch (choice2) {
-               case (1):
-                   d.FillDatabase(file, key);
-                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
-                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
-                   break;
-               case (2):
-                   Scanner sc1 = new Scanner(System.in);
-                   System.out.println("Password to which account would you like to know?");
-                   AccountName = sc1.nextLine();
-                   System.out.println(d.browseFile(AccountName, file, key));
-                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
-                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
-
-                   break;
-               case (3):
-                   Scanner sc2 = new Scanner(System.in);
-                   System.out.println("Which account would you like to delete?");
-                   AccountName = sc2.nextLine();
-                   d.DeleteElement(AccountName, file, key);
-                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
-                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
-
-                   break;
-               case (4):
-                   System.out.println("ACCOUNT - PASSWORD");
-                   String[] pairs = d.ReadDatabase(file, key).split(", ");
-                   for (String pair : pairs) {
-                       System.out.println(pair);
-                   }
-                   System.out.println("back(9)" + "   " + "end(0)");
-                   break;
-               case (9):
-                   System.out.println("What would you like to do?\nChoose from following options:\n1 - Enter new element\n" +
-                           "2 - Show password to account\n3 - Delete element\n4 - Show whole database");
-                   continue;
-               case(0):
-                   System.exit(0);
-
-               default:
-                   System.out.println("Something went wrong! Try again!");
-                   System.out.println("back(9)" + "   " + "end(0)");
-                   choice2=sc.nextInt();
-
-           }
-       }
     }
+
+
+
 }
+
+
+
+
+}
+

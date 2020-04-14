@@ -14,7 +14,8 @@ class Encrypting
     static private Cipher cipher;
 
 
-    public static String encryptIt(String plainText, String password, int lineNumber) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public static String encryptIt(String plainText, String password, int lineNumber)
+    {
         try
         {
 
@@ -22,9 +23,6 @@ class Encrypting
             Encrypting.cipher = Cipher.getInstance("AES");
             // initialization of secret key factory
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-
-
-
 
             KeySpec spec = new PBEKeySpec(password.toCharArray(),Integer.toString(lineNumber).getBytes(), 65536, 128);
             SecretKey tmp = factory.generateSecret(spec);
@@ -45,8 +43,7 @@ class Encrypting
         }
         catch(Exception e)
         {
-            System.out.println(e.fillInStackTrace());
-            System.out.println(" Error: Somethig was wrong!");
+            System.out.println(InterfaceTexts.generalErrorText);
             return null;
         }
 
@@ -82,7 +79,7 @@ class Encrypting
         catch (Exception e)
         {
             e.fillInStackTrace();
-            System.out.println(" Error: Somethig was wrong!");
+            System.out.println(InterfaceTexts.generalErrorText);
             return null;
         }
     }
