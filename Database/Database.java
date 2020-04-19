@@ -80,8 +80,6 @@ public class Database
 
     /**
      * Attach new element to database, asks for password, generates password
-
-
      */
     public void FillDatabase() throws IOException
     {
@@ -96,27 +94,26 @@ public class Database
 
         /* Writing to the file accounts + passwords */
 
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+        BufferedReader reader = new BufferedReader(new FileReader(file));
 
-           /* if database is empty, it has 1 line -- database password  */
-          int lastLineIndex=1;
+        /* if database is empty, it has 1 line -- database password  */
+        int lastLineIndex=1;
 
-          /* code, which allows us to detect last  line number */
-           while(reader.readLine()!=null)
+        /* code, which allows us to detect last  line number */
+        while(reader.readLine()!=null)
            {
                ++lastLineIndex;
            }
 
-           /* Writing to the file accounts + passwords */
-            writer.write(Encrypting.encryptIt(email + " - " + account_password,database_password,lastLineIndex) + "\n");
-            writer.close();
-            reader.close();
+        /* Writing to the file accounts + passwords */
+        writer.write(Encrypting.encryptIt(email + " - " + account_password,database_password,lastLineIndex) + "\n");
+        writer.close();
+        reader.close();
     }
 
     /**
      * Reads the whole database according to first cipher line:
-
      * @return decrypted database
      */
     public String ReadDatabase() throws IOException
@@ -161,7 +158,7 @@ public class Database
     {
         BufferedReader br=new BufferedReader(new FileReader(file));
         String codeLine=br.readLine()+"\n";
-        /* Transferring data from file to map to map */
+        /* Transferring data from file to map  */
         String[] pairs=this.ReadDatabase().split(", ");
         Map<String, String> myMap = new HashMap<>();
         for (String pair : pairs)
@@ -172,57 +169,47 @@ public class Database
         /* Function to sort map */
         Map<String, String> sortedMap = new TreeMap<>(myMap);
         /* Deleting old file */
-       System.out.println(InterfaceTexts.safetyQuestion);
-       String answer=sc.next();
-       String finalMessage="";
+        System.out.println(InterfaceTexts.safetyQuestion);
+        String answer=sc.next();
+        String finalMessage="";
 
-       switch(answer)
-       {
-           case ("n"):
-           finalMessage+=InterfaceTexts.noRemovedFinalMessage;
-           break;
+        switch(answer)
+        {
+            case ("n"):
+                finalMessage+=InterfaceTexts.noRemovedFinalMessage;
+                break;
 
+            case("y"):
+                finalMessage+=InterfaceTexts.RemovedFinalMessage;
+                sortedMap.remove(AccountName);
+                break;
 
-           case("y"):
-
-               finalMessage+=InterfaceTexts.RemovedFinalMessage;
-               sortedMap.remove(AccountName);
-               break;
-           default:
-
-
-
+            default:
        }
         File f = new File(file);
 
 
         if(f.delete())
         {
-                /* Creating new file, with same name as the old one */
-                BufferedWriter bf = new BufferedWriter(new FileWriter(file, true));
-                int lineIndex=2;
-                bf.write(codeLine);
+            /* Creating new file, with same name as the old one */
+            BufferedWriter bf = new BufferedWriter(new FileWriter(file, true));
+            int lineIndex=2;
+            bf.write(codeLine);
 
-
-                for(Map.Entry<String, String> entry : sortedMap.entrySet())
+            for(Map.Entry<String, String> entry : sortedMap.entrySet())
                 {
                     /* Encrypting data */
-
                     String a = Encrypting.encryptIt(entry.getKey() + " - " + entry.getValue(),database_password, lineIndex);
                     assert a != null;
                     bf.write(a);
                     bf.newLine();
                     ++lineIndex;
                 }
-                bf.flush();
-                bf.close();
-
+            bf.flush();
+            bf.close();
             System.out.println(finalMessage);
         }
-        else
-            {
-              System.out.println(InterfaceTexts.generalErrorText);
-            }
+        else { System.out.println(InterfaceTexts.generalErrorText); }
     }
 
     /**
@@ -259,15 +246,19 @@ public class Database
         }
         else if (input.equals("n"))
         {
-            /* Generating random password */
-            String PassSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "1234567890" + "1!@&#%ß";
-            char [] password = new char[lenght];
-            for (int i = 0; i<lenght; ++i) {
-                int rand = (int) (Math.random() * PassSet.length());
-                password[i] = PassSet.charAt(rand);
-            }
-            return new String(password);
+            return passGen(lenght);
         }
         else {return generalErrorText;}
+    }
+    public String passGen(int lenght)
+    {
+        /* Generating random password */
+        String PassSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "1234567890" + "1!@&#%ß";
+        char [] password = new char[lenght];
+        for (int i = 0; i<lenght; ++i) {
+            int rand = (int) (Math.random() * PassSet.length());
+            password[i] = PassSet.charAt(rand);
+        }
+        return new String(password);
     }
 }
